@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy API</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+
+    <div class="container">
+      <h1>Celebrity Search</h1>
+      <div id="buttons-view"></div>
+  
+      <form id="celebrity-form">
+        <label for="celebrity-input">Search for a celebrity</label>
+        <input type="text" id="celebrity-input">
+        <br>
+        <input id="add-celebrity" type="submit" value="Search">
+      </form>
+
+      <div id="celebritys-view"></div>
+
+      </div>
+  
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script type="text/javascript">
+        var celebritys = ["Will Ferrell", "Ellen DeGeneres", "Beyonce", "Brad Pitt", "Tom Hanks", "Oprah Winfrey", "Dwayne Johnson", "Taylor Swift", "JayZ", "Jennifer Aniston", "Rihanna", "Kanye West", "Arnold Schwarzenegger"];
+        function displaycelebrityInfo() {
+          var celebrity = $(this).attr("data-name");
+          var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=URR1T3uzc68ornFaBgrX2mbR7fCa9P9M&q="+ celebrity +"&limit=10&offset=0&rating=G&lang=en" ;
+          $.ajax({
+            url: queryURL,
+            method: "GET"
+          }).then(function(response) {
+            var celebrityDiv = $("<div class='celebrity'>");
+              for(i=0; i<10; i++){
+            console.log(response);
+            var pic = response.data[i].images.original_still.url;
+            var dataStill= response.data[i].images.original_still.url;
+            var dataAnimate= response.data[i].images.original.url;
+            var dataState= "still";
+            var image = $("<img>").addClass("gif");
+            image.attr("src", pic);
+            image.attr("data-state", dataState);
+            image.attr("data-animate", dataAnimate);
+            image.attr("data-still", dataStill);
+            celebrityDiv.prepend(image);
+              }
+              $("#celebritys-view").html(celebrityDiv);
+          });
+
+        }
+
+        function renderButtons() {
+          $("#buttons-view").empty(); 
+          for (var i = 0; i < celebritys.length; i++) {
+            var a = $("<button>");
+            a.addClass("celebrity-btn btn-dark");
+            a.attr("data-name", celebritys[i]);        
+            a.text(celebritys[i]);       
+            $("#buttons-view").append(a);
+          }
+        }
+        
+        $("#add-celebrity").on("click", function(event) {
+          event.preventDefault();
+          var celebrity = $("#celebrity-input").val().trim();          
+          celebritys.push(celebrity);
+          renderButtons();
+        });
+        $(document).on("click", ".celebrity-btn", displaycelebrityInfo);
+        renderButtons();
+
+        $(document).on("click", ".gif", function() {
+      var state = $(this).attr("data-state");
+      if (state === "still") {
+        $(this).attr("src", $(this).attr("data-animate"));
+        $(this).attr("data-state", "animate");
+      } else {
+        $(this).attr("src", $(this).attr("data-still"));
+        $(this).attr("data-state", "still");
+      }
+      
+    });
+      </script>
+    </div>
+  </body>
+
+</html>
